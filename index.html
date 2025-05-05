@@ -1,506 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinguaFlow Translate</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.3/dist/tailwind.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #6d28d9;
-            --secondary: #8b5cf6;
-            --accent: #a78bfa;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-        }
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-        }
-        
-        .text-gradient {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .card {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(109, 40, 217, 0.2);
-            transition: all 0.3s ease;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(109, 40, 217, 0.3);
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(109, 40, 217, 0.4);
-        }
-        
-        .btn-primary::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0.3),
-                rgba(255, 255, 255, 0)
-            );
-            transform: rotate(30deg);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-primary:hover::after {
-            left: 100%;
-        }
-        
-        .language-select {
-            transition: all 0.3s ease;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .language-select:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
-        }
-        
-        .language-select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.3);
-        }
-        
-        .text-area {
-            transition: all 0.3s ease;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .text-area:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
-        }
-        
-        .text-area:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.3);
-        }
-        
-        .output-box {
-            min-height: 150px;
-            border: 1px dashed #cbd5e1;
-            transition: all 0.3s ease;
-        }
-        
-        .output-box:hover {
-            border-color: var(--accent);
-        }
-        
-        .btn-secondary {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn-secondary:hover {
-            transform: translateY(-2px);
-        }
-        
-        .btn-secondary::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                to bottom right,
-                rgba(255, 255, 255, 0.3),
-                rgba(255, 255, 255, 0)
-            );
-            transform: translateX(-100%);
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover::after {
-            transform: translateX(100%);
-        }
-        
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-        
-        .floating {
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        .scroll-effect {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s ease;
-        }
-        
-        .scroll-effect.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        
-        .pulse {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(109, 40, 217, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0); }
-        }
-        
-        .glow-text {
-            text-shadow: 0 0 10px rgba(167, 139, 250, 0.7);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Smart AI Language Translator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+    select, input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    textarea {
+      height: 120px;
+      resize: vertical;
+    }
+    .output {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .tools {
+      margin-top: 10px;
+    }
+    .tools button {
+      margin-right: 10px;
+    }
+  </style>
 </head>
-<body class="flex flex-col items-center justify-center p-4">
-    <header class="w-full max-w-4xl mb-8 mt-12 scroll-effect">
-        <h1 class="text-5xl font-bold text-center text-gradient glow-text">LinguaFlow Translate</h1>
-        <p class="text-center text-purple-600 mt-2">Your premium AI-powered translation experience</p>
-    </header>
-    
-    <main class="w-full max-w-4xl card p-8 scroll-effect">
-        <form id="translator-form" class="space-y-6">
-            <div class="relative">
-                <label for="text-input" class="block mb-3 text-lg font-medium text-purple-800">Enter text to translate:</label>
-                <textarea id="text-input" class="w-full p-4 text-area rounded-lg text-gray-700" rows="5" placeholder="Type or paste your text here..."></textarea>
-                <div class="absolute bottom-3 right-3 flex space-x-2">
-                    <button type="button" onclick="document.getElementById('text-input').value = ''" class="text-gray-400 hover:text-purple-600 transition">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label for="source-language" class="block mb-3 text-lg font-medium text-purple-800">From:</label>
-                    <select id="source-language" class="w-full p-3 language-select rounded-lg cursor-pointer">
-                        <option value="">Select source language</option>
-                        <option value="Bengali">Bengali</option>
-                        <option value="English">English</option>
-                        <option value="Hindi">Hindi</option>
-                        <option value="Urdu">Urdu</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="Chinese">Chinese</option>
-                        <option value="Turkish">Turkish</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="French">French</option>
-                        <option value="Russian">Russian</option>
-                        <option value="Portuguese">Portuguese</option>
-                        <option value="German">German</option>
-                        <option value="Japanese">Japanese</option>
-                        <option value="Korean">Korean</option>
-                        <option value="Italian">Italian</option>
-                        <option value="Dutch">Dutch</option>
-                        <option value="Greek">Greek</option>
-                        <option value="Swedish">Swedish</option>
-                        <option value="Polish">Polish</option>
-                        <option value="Thai">Thai</option>
-                        <option value="Vietnamese">Vietnamese</option>
-                        <option value="Indonesian">Indonesian</option>
-                        <option value="Persian">Persian</option>
-                        <option value="Hebrew">Hebrew</option>
-                        <option value="Danish">Danish</option>
-                        <option value="Finnish">Finnish</option>
-                        <option value="Czech">Czech</option>
-                        <option value="Hungarian">Hungarian</option>
-                        <option value="Romanian">Romanian</option>
-                        <option value="Norwegian">Norwegian</option>
-                        <option value="Ukrainian">Ukrainian</option>
-                        <option value="Malay">Malay</option>
-                        <option value="Swahili">Swahili</option>
-                        <option value="Tamil">Tamil</option>
-                        <option value="Burmese">Burmese</option>
-                        <option value="Filipino">Filipino</option>
-                        <option value="Serbian">Serbian</option>
-                        <option value="Slovak">Slovak</option>
-                    </select>
-                </div>
-                
-                <div>
-                    <label for="target-language" class="block mb-3 text-lg font-medium text-purple-800">To:</label>
-                    <select id="target-language" class="w-full p-3 language-select rounded-lg cursor-pointer">
-                        <option value="">Select target language</option>
-                        <option value="Bengali">Bengali</option>
-                        <option value="English">English</option>
-                        <option value="Hindi">Hindi</option>
-                        <option value="Urdu">Urdu</option>
-                        <option value="Arabic">Arabic</option>
-                        <option value="Chinese">Chinese</option>
-                        <option value="Turkish">Turkish</option>
-                        <option value="Spanish">Spanish</option>
-                        <option value="French">French</option>
-                        <option value="Russian">Russian</option>
-                        <option value="Portuguese">Portuguese</option>
-                        <option value="German">German</option>
-                        <option value="Japanese">Japanese</option>
-                        <option value="Korean">Korean</option>
-                        <option value="Italian">Italian</option>
-                        <option value="Dutch">Dutch</option>
-                        <option value="Greek">Greek</option>
-                        <option value="Swedish">Swedish</option>
-                        <option value="Polish">Polish</option>
-                        <option value="Thai">Thai</option>
-                        <option value="Vietnamese">Vietnamese</option>
-                        <option value="Indonesian">Indonesian</option>
-                        <option value="Persian">Persian</option>
-                        <option value="Hebrew">Hebrew</option>
-                        <option value="Danish">Danish</option>
-                        <option value="Finnish">Finnish</option>
-                        <option value="Czech">Czech</option>
-                        <option value="Hungarian">Hungarian</option>
-                        <option value="Romanian">Romanian</option>
-                        <option value="Norwegian">Norwegian</option>
-                        <option value="Ukrainian">Ukrainian</option>
-                        <option value="Malay">Malay</option>
-                        <option value="Swahili">Swahili</option>
-                        <option value="Tamil">Tamil</option>
-                        <option value="Burmese">Burmese</option>
-                        <option value="Filipino">Filipino</option>
-                        <option value="Serbian">Serbian</option>
-                        <option value="Slovak">Slovak</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div class="pt-2">
-                <button id="translate-btn" type="button" class="w-full py-4 btn-primary rounded-lg text-xl font-semibold pulse">
-                    <span class="flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                        </svg>
-                        Translate Now
-                    </span>
-                </button>
-            </div>
-        </form>
-        
-        <section id="output-section" class="mt-8 scroll-effect">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-bold text-purple-800">Translation Result:</h2>
-                <div class="flex space-x-3">
-                    <button id="copy-btn" class="btn-secondary px-4 py-2 bg-purple-100 text-purple-800 rounded-lg flex items-center hover:bg-purple-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                        </svg>
-                        Copy
-                    </button>
-                    <button id="share-btn" class="btn-secondary px-4 py-2 bg-purple-100 text-purple-800 rounded-lg flex items-center hover:bg-purple-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                        </svg>
-                        Share
-                    </button>
-                </div>
-            </div>
-            <div id="output" class="p-4 output-box rounded-lg bg-gray-50 text-gray-700"></div>
-        </section>
-    </main>
-    
-    <footer class="mt-12 mb-8 scroll-effect">
-        <p class="text-center text-purple-600">This application is created by SM Ripon</p>
-    </footer>
-    
-    <script>
-        // Scroll animation trigger
-        const scrollElements = document.querySelectorAll('.scroll-effect');
-        
-        const elementInView = (el) => {
-            const elementTop = el.getBoundingClientRect().top;
-            return (
-                elementTop <= (window.innerHeight || document.documentElement.clientHeight)
-            );
-        };
-        
-        const displayScrollElement = (element) => {
-            element.classList.add('active');
-        };
-        
-        const handleScrollAnimation = () => {
-            scrollElements.forEach((el) => {
-                if (elementInView(el)) {
-                    displayScrollElement(el);
-                }
-            });
-        };
-        
-        window.addEventListener('scroll', () => {
-            handleScrollAnimation();
+<body>
+
+  <h2>Smart AI Language Translator</h2>
+
+  <label for="sourceLangSelect">select your Source Language</label>
+  <select id="sourceLangSelect">
+    <option value="">-- None --</option>
+  </select>
+  <input id="sourceLangInput" placeholder="If you didn't find your source language there in menu, type source language here" />
+
+  <label for="userText">Text to Translate</label>
+  <textarea id="userText" placeholder="Enter your text here..."></textarea>
+
+  <label for="targetLangSelect">select your Destination Language</label>
+  <select id="targetLangSelect">
+    <option value="">-- None --</option>
+  </select>
+  <input id="targetLangInput" placeholder="If you didn't find your source language there in menu, type destination language here" />
+
+  <button onclick="translateText()">Translate</button>
+
+  <div id="result" class="output" style="display:none;">
+    <b>Translation:</b>
+    <div id="translatedText" style="margin-top:10px;">AI is translating your text.</div>
+    <div class="tools">
+      <button onclick="copyText()">Copy</button>
+      <button onclick="shareText()">Share</button>
+    </div>
+  </div>
+
+  <script>
+    const apiKey = "AIzaSyDYeLxp7Jp5qSypbVBPy9v_XYmz7Sc1qfs";
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+
+    const languages = [
+      "Afrikaans","Albanian","Amharic","Arabic","Armenian","Azerbaijani","Basque","Belarusian","Bengali",
+      "Bosnian","Bulgarian","Catalan","Cebuano","Chichewa","Chinese","Corsican","Croatian","Czech","Danish",
+      "Dutch","English","Esperanto","Estonian","Filipino","Finnish","French","Frisian","Galician","Georgian",
+      "German","Greek","Gujarati","Haitian Creole","Hausa","Hawaiian","Hebrew","Hindi","Hmong","Hungarian",
+      "Icelandic","Igbo","Indonesian","Irish","Italian","Japanese","Javanese","Kannada","Kazakh","Khmer",
+      "Korean","Kurdish","Kyrgyz","Lao","Latin","Latvian","Lithuanian","Luxembourgish","Macedonian","Malagasy",
+      "Malay","Malayalam","Maltese","Maori","Marathi","Mongolian","Myanmar","Nepali","Norwegian","Odia",
+      "Pashto","Persian","Polish","Portuguese","Punjabi","Romanian","Russian","Samoan","Scots Gaelic","Serbian",
+      "Sesotho","Shona","Sindhi","Sinhala","Slovak","Slovenian","Somali","Spanish","Sundanese","Swahili",
+      "Swedish","Tajik","Tamil","Tatar","Telugu","Thai","Turkish","Turkmen","Ukrainian","Urdu","Uyghur",
+      "Uzbek","Vietnamese","Welsh","Xhosa","Yiddish","Yoruba","Zulu"
+    ];
+
+    // Populate dropdowns
+    const sourceLangSelect = document.getElementById("sourceLangSelect");
+    const targetLangSelect = document.getElementById("targetLangSelect");
+
+    languages.sort().forEach(lang => {
+      sourceLangSelect.add(new Option(lang, lang));
+      targetLangSelect.add(new Option(lang, lang));
+    });
+
+    async function translateText() {
+      const sourceLang = sourceLangSelect.value || document.getElementById("sourceLangInput").value.trim();
+      const targetLang = targetLangSelect.value || document.getElementById("targetLangInput").value.trim();
+      const userText = document.getElementById("userText").value.trim();
+      const resultBox = document.getElementById("result");
+      const outputBox = document.getElementById("translatedText");
+
+      if (!sourceLang || !targetLang || !userText) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const prompt = `Translate this text accurately and clearly from "${sourceLang}" to "${targetLang}". Only return the translated version without explanations or extra comments. Text: ${userText}`;
+
+      try {
+        const response = await fetch(apiUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }]
+          })
         });
-        
-        // Initialize elements in view on load
-        document.addEventListener('DOMContentLoaded', () => {
-            handleScrollAnimation();
-        });
-        
-        // Translation functionality
-        document.getElementById('translate-btn').addEventListener('click', () => {
-            const textInput = document.getElementById('text-input').value.trim();
-            const sourceLang = document.getElementById('source-language').value;
-            const targetLang = document.getElementById('target-language').value;
-            const output = document.getElementById('output');
-            const translateBtn = document.getElementById('translate-btn');
-            
-            output.innerText = '';
-            
-            if (!textInput) {
-                alert("Please enter text to translate.");
-                return;
-            }
-            if (!sourceLang) {
-                alert("Please select the source language.");
-                return;
-            }
-            if (!targetLang) {
-                alert("Please select the target language.");
-                return;
-            }
-            if (sourceLang === targetLang) {
-                alert("Please choose two different languages.");
-                return;
-            }
-            
-            // Add loading effect
-            translateBtn.innerHTML = `
-                <span class="flex items-center justify-center">
-                    <svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Translating...
-                </span>
-            `;
-            translateBtn.classList.remove('pulse');
-            translateBtn.disabled = true;
-            
-            const substitutedPrompt = `Translate the following text: "${textInput}" from ${sourceLang} to ${targetLang}.`;
-            
-            const ws = new WebSocket('wss://backend.buildpicoapps.com/ask_ai_streaming_v2');
-            
-            ws.addEventListener("open", () => {
-                ws.send(
-                    JSON.stringify({
-                        appId: "relate-development",
-                        prompt: substitutedPrompt,
-                    })
-                );
-            });
-            
-            ws.addEventListener("message", (event) => {
-                output.innerText = `${output.innerText}${event.data}`;
-            });
-            
-            ws.addEventListener("close", (event) => {
-                console.log("Connection closed", event.code, event.reason);
-                translateBtn.innerHTML = `
-                    <span class="flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                        </svg>
-                        Translate Now
-                    </span>
-                `;
-                translateBtn.disabled = false;
-                translateBtn.classList.add('pulse');
-                
-                if (event.code != 1000) {
-                    alert("Translation failed. Please try again later.");
-                }
-            });
-            
-            ws.addEventListener("error", (error) => {
-                console.log('WebSocket error', error);
-                translateBtn.innerHTML = `
-                    <span class="flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
-                        </svg>
-                        Translate Now
-                    </span>
-                `;
-                translateBtn.disabled = false;
-                translateBtn.classList.add('pulse');
-                alert("Translation failed. Please try again later.");
-            });
-        });
-        
-        document.getElementById('copy-btn').addEventListener('click', () => {
-            const textToCopy = document.getElementById('output').innerText;
-            if (!textToCopy) {
-                alert('No text to copy!');
-                return;
-            }
-            
-            navigator.clipboard.writeText(textToCopy).then(() => {
-                const copyBtn = document.getElementById('copy-btn');
-                const originalText = copyBtn.innerHTML;
-                copyBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Copied!
-                `;
-                setTimeout(() => {
-                    copyBtn.innerHTML = originalText;
-                }, 2000);
-            });
-        });
-        
-        document.getElementById('share-btn').addEventListener('click', () => {
-            const textToShare = document.getElementById('output').innerText;
-            if (!textToShare) {
-                alert('No text to share!');
-                return;
-            }
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'LinguaFlow Translation',
-                    text: textToShare,
-                }).then(() => {
-                    console.log('Successful share');
-                }).catch((error) => {
-                    console.log('Error sharing', error);
-                });
-            } else {
-                alert('Sharing not supported on this device.');
-            }
-        });
-    </script>
+
+        const data = await response.json();
+        const translated = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Translation failed.";
+
+        outputBox.textContent = translated;
+        resultBox.style.display = "block";
+
+      } catch (err) {
+        outputBox.textContent = "Error: " + err.message;
+        resultBox.style.display = "block";
+      }
+    }
+
+    function copyText() {
+      const text = document.getElementById("translatedText").textContent;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Text copied to clipboard!");
+      }, err => {
+        alert("Failed to copy: " + err);
+      });
+    }
+
+    function shareText() {
+      const text = document.getElementById("translatedText").textContent;
+      if (navigator.share) {
+        navigator.share({ text });
+      } else {
+        alert("Web Share API not supported on this browser.");
+      }
+    }
+  </script>
+
 </body>
 </html>
