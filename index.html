@@ -35,6 +35,8 @@
       margin-right: 10px;
     }
   </style>
+  <script src="https://toolnovanext.github.io/scripts/navigation.js" defer></script>
+  <script src="https://toolnovanext.github.io/scripts/notification.js" defer></script>
 </head>
 <body>
 
@@ -75,77 +77,4 @@
       "Bosnian","Bulgarian","Catalan","Cebuano","Chichewa","Chinese","Corsican","Croatian","Czech","Danish",
       "Dutch","English","Esperanto","Estonian","Filipino","Finnish","French","Frisian","Galician","Georgian",
       "German","Greek","Gujarati","Haitian Creole","Hausa","Hawaiian","Hebrew","Hindi","Hmong","Hungarian",
-      "Icelandic","Igbo","Indonesian","Irish","Italian","Japanese","Javanese","Kannada","Kazakh","Khmer",
-      "Korean","Kurdish","Kyrgyz","Lao","Latin","Latvian","Lithuanian","Luxembourgish","Macedonian","Malagasy",
-      "Malay","Malayalam","Maltese","Maori","Marathi","Mongolian","Myanmar","Nepali","Norwegian","Odia",
-      "Pashto","Persian","Polish","Portuguese","Punjabi","Romanian","Russian","Samoan","Scots Gaelic","Serbian",
-      "Sesotho","Shona","Sindhi","Sinhala","Slovak","Slovenian","Somali","Spanish","Sundanese","Swahili",
-      "Swedish","Tajik","Tamil","Tatar","Telugu","Thai","Turkish","Turkmen","Ukrainian","Urdu","Uyghur",
-      "Uzbek","Vietnamese","Welsh","Xhosa","Yiddish","Yoruba","Zulu"
-    ];
-
-    // Populate dropdowns
-    const sourceLangSelect = document.getElementById("sourceLangSelect");
-    const targetLangSelect = document.getElementById("targetLangSelect");
-
-    languages.sort().forEach(lang => {
-      sourceLangSelect.add(new Option(lang, lang));
-      targetLangSelect.add(new Option(lang, lang));
-    });
-
-    async function translateText() {
-      const sourceLang = sourceLangSelect.value || document.getElementById("sourceLangInput").value.trim();
-      const targetLang = targetLangSelect.value || document.getElementById("targetLangInput").value.trim();
-      const userText = document.getElementById("userText").value.trim();
-      const resultBox = document.getElementById("result");
-      const outputBox = document.getElementById("translatedText");
-
-      if (!sourceLang || !targetLang || !userText) {
-        alert("Please fill in all fields.");
-        return;
-      }
-
-      const prompt = `Translate this text accurately and clearly from "${sourceLang}" to "${targetLang}". Only return the translated version without explanations or extra comments. Text: ${userText}`;
-
-      try {
-        const response = await fetch(apiUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }]
-          })
-        });
-
-        const data = await response.json();
-        const translated = data?.candidates?.[0]?.content?.parts?.[0]?.text || "Translation failed.";
-
-        outputBox.textContent = translated;
-        resultBox.style.display = "block";
-
-      } catch (err) {
-        outputBox.textContent = "Error: " + err.message;
-        resultBox.style.display = "block";
-      }
-    }
-
-    function copyText() {
-      const text = document.getElementById("translatedText").textContent;
-      navigator.clipboard.writeText(text).then(() => {
-        alert("Text copied to clipboard!");
-      }, err => {
-        alert("Failed to copy: " + err);
-      });
-    }
-
-    function shareText() {
-      const text = document.getElementById("translatedText").textContent;
-      if (navigator.share) {
-        navigator.share({ text });
-      } else {
-        alert("Web Share API not supported on this browser.");
-      }
-    }
-  </script>
-
-</body>
-</html>
+      "Icelandic","Igbo","Indonesian","Irish","Italia
