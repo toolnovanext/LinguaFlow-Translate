@@ -1,80 +1,375 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Smart AI Language Translator</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
-      max-width: 700px;
-      margin: auto;
-    }
-    select, input, textarea, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    textarea {
-      height: 120px;
-      resize: vertical;
-    }
-    .output {
-      margin-top: 20px;
-      background: #fff;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    .tools {
-      margin-top: 10px;
-    }
-    .tools button {
-      margin-right: 10px;
-    }
-  </style>
-  <script src="https://toolnovanext.github.io/scripts/navigation.js" defer></script>
-  <script src="https://toolnovanext.github.io/scripts/notification.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart AI Language Translator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better aesthetics */
+        textarea::-webkit-scrollbar {
+            width: 8px;
+        }
+        textarea::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        textarea::-webkit-scrollbar-thumb:hover {
+            background: #555;
+            border-radius: 10px;
+        }
+        /* Hide the default file input for the custom button */
+        #file-upload {
+            display: none;
+        }
+
+        /* Fix for potential dropdown overlap (though not present in the original, this ensures accessibility) */
+        select {
+            z-index: 10;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-  <h2>Smart AI Language Translator</h2>
+    <div class="w-full max-w-2xl mx-auto">
+        <div id="translator-card" class="bg-white rounded-xl shadow-2xl p-6 md:p-8 transition-all duration-500">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-center text-gray-800 mb-8">Smart AI Language Translator ✨</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="sourceLangSelect" class="block text-sm font-semibold text-gray-700 mb-1">From Language</label>
+                    <select id="sourceLangSelect" class="mt-1 block w-full p-3 text-base border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg shadow-sm appearance-none cursor-pointer transition duration-150 ease-in-out hover:border-indigo-400">
+                        <option value="" selected disabled>Select Source Language</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="targetLangSelect" class="block text-sm font-semibold text-gray-700 mb-1">To Language</label>
+                    <select id="targetLangSelect" class="mt-1 block w-full p-3 text-base border-gray-300 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-lg shadow-sm appearance-none cursor-pointer transition duration-150 ease-in-out hover:border-indigo-400">
+                        <option value="" selected disabled>Select Target Language</option>
+                    </select>
+                </div>
+            </div>
 
-  <label for="sourceLangSelect">select your Source Language</label>
-  <select id="sourceLangSelect">
-    <option value="">-- None --</option>
-  </select>
-  <input id="sourceLangInput" placeholder="If you didn't find your source language there in menu, type source language here" />
+            <div class="mb-6">
+                <label for="userText" class="block text-sm font-semibold text-gray-700 mb-1">Enter Text</label>
+                <textarea id="userText" rows="6" class="mt-1 block w-full border border-gray-300 rounded-lg shadow-inner p-4 focus:ring-indigo-500 focus:border-indigo-500 transition duration-150 ease-in-out" placeholder="Type or paste your text here..."></textarea>
+            </div>
 
-  <label for="userText">Text to Translate</label>
-  <textarea id="userText" placeholder="Enter your text here..."></textarea>
+            <div class="mt-4 flex flex-col sm:flex-row gap-4">
+                <button id="upload-btn" class="w-full sm:w-auto cursor-pointer inline-flex items-center justify-center px-4 py-3 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+                    <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    Upload .txt File
+                </button>
+                <input id="file-upload" type="file" accept=".txt"/>
+                
+                <button id="translate-btn" class="w-full sm:flex-1 inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-lg shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out disabled:opacity-50" disabled>
+                    Translate Text
+                </button>
+            </div>
+        </div>
 
-  <label for="targetLangSelect">select your Destination Language</label>
-  <select id="targetLangSelect">
-    <option value="">-- None --</option>
-  </select>
-  <input id="targetLangInput" placeholder="If you didn't find your source language there in menu, type destination language here" />
+        <div id="loading-indicator" class="text-center p-12 bg-white rounded-xl shadow-2xl" style="display:none;">
+            <svg class="animate-spin h-10 w-10 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p class="mt-4 text-lg font-medium text-gray-700">Translating with Gemini AI...</p>
+        </div>
 
-  <button onclick="translateText()">Translate</button>
+        <div id="result-card" class="bg-white rounded-xl shadow-2xl p-6 md:p-8" style="display:none;">
+            <div id="result-content">
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Original Text 📄</h2>
+                <div class="h-32 overflow-y-auto border border-gray-200 bg-gray-50 p-3 rounded-lg mb-6 shadow-inner">
+                    <p id="original-text" class="text-gray-600 whitespace-pre-wrap"></p>
+                </div>
+                
+                <h2 class="text-xl font-bold text-gray-800 mb-2">Translated Text 🗣️</h2>
+                <div class="h-32 overflow-y-auto border border-indigo-200 bg-indigo-50 p-3 rounded-lg mb-6 shadow-inner">
+                    <p id="translated-text" class="text-gray-800 whitespace-pre-wrap"></p>
+                </div>
+            </div>
+            
+            <div class="mt-6 flex flex-wrap gap-3">
+                <button id="copy-btn" class="flex-1 min-w-[120px] inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-100 transition duration-150 ease-in-out">Copy</button>
+                <button id="download-btn" class="flex-1 min-w-[120px] inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-100 transition duration-150 ease-in-out">Download</button>
+                <button id="reset-btn" class="w-full sm:w-auto flex-grow sm:flex-grow-0 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-lg shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 transition duration-150 ease-in-out">Translate Another</button>
+            </div>
+        </div>
 
-  <div id="result" class="output" style="display:none;">
-    <b>Translation:</b>
-    <div id="translatedText" style="margin-top:10px;">AI is translating your text.</div>
-    <div class="tools">
-      <button onclick="copyText()">Copy</button>
-      <button onclick="shareText()">Share</button>
+        <div id="notification" class="fixed top-5 right-5 bg-red-500 text-white py-2 px-4 rounded-lg shadow-xl transform translate-x-[120%] flex items-center gap-2 z-50" style="transition: transform 0.3s ease-in-out;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+            <p id="notification-message" class="font-medium"></p>
+        </div>
     </div>
-  </div>
 
-  <script>
-    const apiKey = "AIzaSyC2Fsjk3yCRA8hDVYgg5LlMn4sxwoJJaWU";
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM ELEMENTS ---
+            const sourceLangSelect = document.getElementById('sourceLangSelect');
+            const targetLangSelect = document.getElementById('targetLangSelect');
+            const userText = document.getElementById('userText');
+            const fileUpload = document.getElementById('file-upload');
+            const uploadBtn = document.getElementById('upload-btn'); // New element
+            const translateBtn = document.getElementById('translate-btn');
 
-    const languages = [
-      "Afrikaans","Albanian","Amharic","Arabic","Armenian","Azerbaijani","Basque","Belarusian","Bengali",
-      "Bosnian","Bulgarian","Catalan","Cebuano","Chichewa","Chinese","Corsican","Croatian","Czech","Danish",
-      "Dutch","English","Esperanto","Estonian","Filipino","Finnish","French","Frisian","Galician","Georgian",
-      "German","Greek","Gujarati","Haitian Creole","Hausa","Hawaiian","Hebrew","Hindi","Hmong","Hungarian",
-      "Icelandic","Igbo","Indonesian","Irish","Italia
+            const translatorCard = document.getElementById('translator-card');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const resultCard = document.getElementById('result-card');
+
+            const originalTextElem = document.getElementById('original-text');
+            const translatedTextElem = document.getElementById('translated-text');
+
+            const copyBtn = document.getElementById('copy-btn');
+            const downloadBtn = document.getElementById('download-btn');
+            const resetBtn = document.getElementById('reset-btn');
+
+            const notification = document.getElementById('notification');
+            const notificationMessage = document.getElementById('notification-message');
+            
+            const apiKey = "AIzaSyC2Fsjk3yCRA8hDVYgg5LlMn4sxwoJJaWU";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            // --- LANGUAGE LIST ---
+            const languages = [
+                "Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Azerbaijani", "Basque", "Belarusian", "Bengali", "Bosnian",
+                "Bulgarian", "Catalan", "Cebuano", "Chichewa", "Chinese (Simplified)", "Chinese (Traditional)", "Corsican", "Croatian",
+                "Czech", "Danish", "Dutch", "English", "Esperanto", "Estonian", "Filipino", "Finnish", "French", "Frisian", "Galician",
+                "Georgian", "German", "Greek", "Gujarati", "Haitian Creole", "Hausa", "Hawaiian", "Hebrew", "Hindi", "Hmong", "Hungarian",
+                "Icelandic", "Igbo", "Indonesian", "Irish", "Italian", "Japanese", "Javanese", "Kannada", "Kazakh", "Khmer", "Kinyarwanda",
+                "Korean", "Kurdish (Kurmanji)", "Kyrgyz", "Lao", "Latin", "Latvian", "Lithuanian", "Luxembourgish", "Macedonian",
+                "Malagasy", "Malay", "Malayalam", "Maltese", "Maori", "Marathi", "Mongolian", "Myanmar (Burmese)", "Nepali", "Norwegian",
+                "Odia (Oriya)", "Pashto", "Persian", "Polish", "Portuguese", "Punjabi", "Romanian", "Russian", "Samoan", "Scots Gaelic",
+                "Serbian", "Sesotho", "Shona", "Sindhi", "Sinhala", "Slovak", "Slovenian", "Somali", "Spanish", "Sundanese", "Swahili",
+                "Swedish", "Tajik", "Tamil", "Tatar", "Telugu", "Thai", "Turkish", "Turkmen", "Ukrainian", "Urdu", "Uyghur", "Uzbek",
+                "Vietnamese", "Welsh", "Xhosa", "Yiddish", "Yoruba", "Zulu"
+            ];
+
+            // --- FUNCTIONS ---
+
+            /**
+             * Populates the language dropdowns.
+             */
+            function populateLanguages() {
+                languages.forEach(lang => {
+                    // Clone options for source and target
+                    const optionSource = new Option(lang, lang);
+                    const optionTarget = new Option(lang, lang);
+                    sourceLangSelect.add(optionSource);
+                    targetLangSelect.add(optionTarget);
+                });
+            }
+
+            /**
+             * Shows a temporary notification message.
+             * @param {string} message The message to display.
+             * @param {string} type 'success' or 'error'.
+             */
+            function showNotification(message, type = 'error') {
+                // Adjusting color based on type
+                if (type === 'success') {
+                    notification.classList.remove('bg-red-500');
+                    notification.classList.add('bg-green-500');
+
+                } else {
+                    notification.classList.remove('bg-green-500');
+                    notification.classList.add('bg-red-500');
+
+                }
+
+                notificationMessage.textContent = message;
+                // Show notification
+                notification.classList.remove('translate-x-[120%]');
+
+                // Hide after 3 seconds
+                setTimeout(() => {
+                    notification.classList.add('translate-x-[120%]');
+                }, 3000);
+            }
+
+            /**
+             * Toggles the disabled state of the translate button based on input.
+             */
+            function toggleTranslateButton() {
+                const text = userText.value.trim();
+                const sourceLang = sourceLangSelect.value;
+                const targetLang = targetLangSelect.value;
+
+                if (text && sourceLang && targetLang && sourceLang !== targetLang) {
+                    translateBtn.disabled = false;
+                } else {
+                    translateBtn.disabled = true;
+                }
+            }
+
+            /**
+             * Handles file input change to read a .txt file.
+             * @param {Event} event The file input change event.
+             */
+            function handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (file && file.type === "text/plain") {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        userText.value = e.target.result;
+                        toggleTranslateButton(); // Check button state after file load
+                        showNotification(`File "${file.name}" loaded successfully.`, 'success');
+                    };
+                    reader.readAsText(file);
+                } else if (file) {
+                    showNotification("Please upload a valid .txt file.");
+                    fileUpload.value = ''; // Reset file input
+                }
+            }
+            
+            /**
+             * Handles the main translation logic using the Gemini API.
+             */
+            async function handleTranslate() {
+                const sourceLang = sourceLangSelect.value;
+                const targetLang = targetLangSelect.value;
+                const text = userText.value.trim();
+
+                // Validation (Re-check on click for safety)
+                if (!sourceLang || !targetLang || sourceLang === targetLang || !text) {
+                    showNotification("Please select valid languages and enter text.");
+                    return;
+                }
+
+                // UI Transition: Show loading, hide input form
+                translatorCard.style.display = 'none';
+                loadingIndicator.style.display = 'block';
+
+                const prompt = `Translate the following text from ${sourceLang} to ${targetLang}. Focus on high accuracy and natural flow, making it a polished translation. Do not include any introductory phrases, explanations, or quotes/markers. ONLY output the final, enhanced translation.\nTEXT: "${text}"`;
+                
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            contents: [{
+                                parts: [{
+                                    text: prompt
+                                }]
+                            }]
+                        })
+                    });
+
+                    if (!response.ok) {
+                        const errorBody = await response.text();
+                        throw new Error(`API error: ${response.status} - ${errorBody}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    
+                    if (!translatedText) {
+                       throw new Error("Translation failed to return text.");
+                    }
+                    
+                    displayResult(text, translatedText);
+
+                } catch (error) {
+                    console.error('Translation error:', error);
+                    showNotification('Translation failed. Please check the console for details.');
+                    resetUI();
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+
+            /**
+             * Displays the translation result.
+             * @param {string} original - The original text.
+             * @param {string} translated - The translated text.
+             */
+            function displayResult(original, translated) {
+                originalTextElem.textContent = original;
+                translatedTextElem.textContent = translated;
+                resultCard.style.display = 'block';
+            }
+
+            /**
+             * Copies the translated text to the clipboard.
+             */
+            function copyText() {
+                navigator.clipboard.writeText(translatedTextElem.textContent)
+                    .then(() => showNotification('Copied to clipboard!', 'success'))
+                    .catch(err => {
+                        console.error('Failed to copy:', err)
+                        showNotification('Could not copy text.');
+                    });
+            }
+
+            /**
+             * Downloads the translated text as a .txt file.
+             */
+            function downloadText() {
+                const text = translatedTextElem.textContent;
+                const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                const now = new Date();
+                // Create a clean filename
+                const fileName = `Translated_${targetLangSelect.value}_${now.toISOString().replace(/[:.]/g, '-').slice(0, 19)}.txt`;
+                
+                a.href = url;
+                a.download = fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showNotification('Download started!', 'success');
+            }
+
+            /**
+             * Resets the UI to the initial state.
+             */
+            function resetUI() {
+                userText.value = '';
+                sourceLangSelect.value = ''; // Reset dropdown to placeholder
+                targetLangSelect.value = ''; // Reset dropdown to placeholder
+                fileUpload.value = ''; // Reset file input
+                
+                resultCard.style.display = 'none';
+                loadingIndicator.style.display = 'none';
+                translatorCard.style.display = 'block';
+                toggleTranslateButton(); // Disable button after reset
+            }
+
+
+            // --- EVENT LISTENERS ---
+            translateBtn.addEventListener('click', handleTranslate);
+            fileUpload.addEventListener('change', handleFileUpload);
+            copyBtn.addEventListener('click', copyText);
+            downloadBtn.addEventListener('click', downloadText);
+            resetBtn.addEventListener('click', resetUI);
+            uploadBtn.addEventListener('click', () => fileUpload.click()); // Trigger file input on button click
+            
+            // Check button state whenever text or language selection changes
+            userText.addEventListener('input', toggleTranslateButton);
+            sourceLangSelect.addEventListener('change', toggleTranslateButton);
+            targetLangSelect.addEventListener('change', toggleTranslateButton);
+
+
+            // --- INITIALIZATION ---
+            populateLanguages();
+            toggleTranslateButton(); // Set initial button state
+        });
+    </script>
+
+</body>
+</html>
