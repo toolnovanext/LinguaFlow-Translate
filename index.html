@@ -201,47 +201,49 @@
                 }
             }
             
-            async function handleTranslate() {
-                const sourceLang = sourceLangSelect.value;
-                const targetLang = targetLangSelect.value;
-                const text = userText.value.trim();
+async function handleTranslate() {
+    const sourceLang = sourceLangSelect.value;
+    const targetLang = targetLangSelect.value;
+    const text = userText.value.trim();
 
-                if (!sourceLang || !targetLang || sourceLang === targetLang || !text) {
-                    showNotification("Please select valid languages and enter text.");
-                    return;
-                }
+    if (!sourceLang || !targetLang || sourceLang === targetLang || !text) {
+        showNotification("Please select valid languages and enter text.");
+        return;
+    }
 
-                translatorCard.style.display = 'none';
-                loadingIndicator.style.display = 'block';
+    translatorCard.style.display = 'none';
+    loadingIndicator.style.display = 'block';
 
-                const prompt = `Translate the following text from ${sourceLang} to ${targetLang}. Focus on high accuracy and natural flow, making it a polished translation. Do not include any introductory phrases, explanations, or quotes/markers. ONLY output the final, enhanced translation.\nTEXT: "${text}"`;
-                
-                const apiUrl = `https://chatgpt-4-hridoy.vercel.app/?question=${encodeURIComponent(prompt)}`;
-                
-                try {
-                    const response = await fetch(apiUrl);
+    const prompt = `Translate the following text from ${sourceLang} to ${targetLang}. Focus on high accuracy and natural flow, making it a polished translation. Do not include any introductory phrases, explanations, or quotes/markers. ONLY output the final, enhanced translation.\nTEXT: "${text}"`;
+    
+    const apiUrl = `https://chatgpt-4-hridoy.vercel.app/?question=${encodeURIComponent(prompt)}`;
+    
+    try {
+        const response = await fetch(apiUrl);
 
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`API error: ${response.status} - ${errorText || 'Unknown error'}`);
-                    }
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`API error: ${response.status} - ${errorText || 'Unknown error'}`);
+        }
 
-                    const translatedText = await response.text();
-                    
-                    if (!translatedText || translatedText.trim() === '') {
-                        throw new Error("Translation failed: Received an empty response from the API.");
-                    }
-                    
-                    displayResult(text, translatedText.trim());
 
-                } catch (error) {
-                    console.error('Translation error:', error);
-                    showNotification(error.message || 'Translation failed. Please check the console.');
-                    resetUI();
-                } finally {
-                    loadingIndicator.style.display = 'none';
-                }
-            }
+        const data = await response.json();
+        const translatedText = data.result;
+
+        if (!translatedText || translatedText.trim() === '') {
+            throw new Error("Translation failed: Received an empty response from the API.");
+        }
+        
+        displayResult(text, translatedText.trim());
+
+    } catch (error) {
+        console.error('Translation error:', error);
+        showNotification(error.message || 'Translation failed. Please check the console.');
+        resetUI();
+    } finally {
+        loadingIndicator.style.display = 'none';
+    }
+}
 
             function displayResult(original, translated) {
                 originalTextElem.textContent = original;
