@@ -12,7 +12,6 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom scrollbar for better aesthetics */
         textarea::-webkit-scrollbar {
             width: 8px;
         }
@@ -28,12 +27,9 @@
             background: #555;
             border-radius: 10px;
         }
-        /* Hide the default file input for the custom button */
         #file-upload {
             display: none;
         }
-
-
         select {
             z-index: 10;
         }
@@ -110,38 +106,32 @@
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
             </svg>
-            <p id="notification-message" class="font-medium"></p>
+            <p id="notification-message" class="font-medium" aria-live="polite"></p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM ELEMENTS ---
             const sourceLangSelect = document.getElementById('sourceLangSelect');
             const targetLangSelect = document.getElementById('targetLangSelect');
             const userText = document.getElementById('userText');
             const fileUpload = document.getElementById('file-upload');
-            const uploadBtn = document.getElementById('upload-btn'); // New element
+            const uploadBtn = document.getElementById('upload-btn');
             const translateBtn = document.getElementById('translate-btn');
-
             const translatorCard = document.getElementById('translator-card');
             const loadingIndicator = document.getElementById('loading-indicator');
             const resultCard = document.getElementById('result-card');
-
             const originalTextElem = document.getElementById('original-text');
             const translatedTextElem = document.getElementById('translated-text');
-
             const copyBtn = document.getElementById('copy-btn');
             const downloadBtn = document.getElementById('download-btn');
             const resetBtn = document.getElementById('reset-btn');
-
             const notification = document.getElementById('notification');
             const notificationMessage = document.getElementById('notification-message');
             
             const apiKey = "AIzaSyDCFvhS8RVWHicWe4ZjptBJvut_yDp4dJo";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-            // --- LANGUAGE LIST ---
             const languages = [
                 "Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Azerbaijani", "Basque", "Belarusian", "Bengali", "Bosnian",
                 "Bulgarian", "Catalan", "Cebuano", "Chichewa", "Chinese (Simplified)", "Chinese (Traditional)", "Corsican", "Croatian",
@@ -156,14 +146,8 @@
                 "Vietnamese", "Welsh", "Xhosa", "Yiddish", "Yoruba", "Zulu"
             ];
 
-            // --- FUNCTIONS ---
-
-            /**
-             * Populates the language dropdowns.
-             */
             function populateLanguages() {
                 languages.forEach(lang => {
-                    // Clone options for source and target
                     const optionSource = new Option(lang, lang);
                     const optionTarget = new Option(lang, lang);
                     sourceLangSelect.add(optionSource);
@@ -171,41 +155,25 @@
                 });
             }
 
-            /**
-             * Shows a temporary notification message.
-             * @param {string} message The message to display.
-             * @param {string} type 'success' or 'error'.
-             */
             function showNotification(message, type = 'error') {
-                // Adjusting color based on type
                 if (type === 'success') {
                     notification.classList.remove('bg-red-500');
                     notification.classList.add('bg-green-500');
-
                 } else {
                     notification.classList.remove('bg-green-500');
                     notification.classList.add('bg-red-500');
-
                 }
-
                 notificationMessage.textContent = message;
-                // Show notification
                 notification.classList.remove('translate-x-[120%]');
-
-                // Hide after 3 seconds
                 setTimeout(() => {
                     notification.classList.add('translate-x-[120%]');
                 }, 3000);
             }
 
-            /**
-             * Toggles the disabled state of the translate button based on input.
-             */
             function toggleTranslateButton() {
                 const text = userText.value.trim();
                 const sourceLang = sourceLangSelect.value;
                 const targetLang = targetLangSelect.value;
-
                 if (text && sourceLang && targetLang && sourceLang !== targetLang) {
                     translateBtn.disabled = false;
                 } else {
@@ -213,41 +181,32 @@
                 }
             }
 
-            /**
-             * Handles file input change to read a .txt file.
-             * @param {Event} event The file input change event.
-             */
             function handleFileUpload(event) {
                 const file = event.target.files[0];
                 if (file && file.type === "text/plain") {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         userText.value = e.target.result;
-                        toggleTranslateButton(); // Check button state after file load
+                        toggleTranslateButton();
                         showNotification(`File "${file.name}" loaded successfully.`, 'success');
                     };
                     reader.readAsText(file);
                 } else if (file) {
                     showNotification("Please upload a valid .txt file.");
-                    fileUpload.value = ''; // Reset file input
+                    fileUpload.value = '';
                 }
             }
             
-            /**
-             * Handles the main translation logic using the Gemini API.
-             */
             async function handleTranslate() {
                 const sourceLang = sourceLangSelect.value;
                 const targetLang = targetLangSelect.value;
                 const text = userText.value.trim();
 
-                // Validation (Re-check on click for safety)
                 if (!sourceLang || !targetLang || sourceLang === targetLang || !text) {
                     showNotification("Please select valid languages and enter text.");
                     return;
                 }
 
-                // UI Transition: Show loading, hide input form
                 translatorCard.style.display = 'none';
                 loadingIndicator.style.display = 'block';
 
@@ -269,43 +228,42 @@
                     });
 
                     if (!response.ok) {
-                        const errorBody = await response.text();
-                        throw new Error(`API error: ${response.status} - ${errorBody}`);
+                        let errorData;
+                        try {
+                            errorData = await response.json();
+                        } catch (e) {
+                            errorData = await response.text();
+                        }
+                        const errorMessage = errorData?.error?.message || JSON.stringify(errorData);
+                        throw new Error(`API error: ${response.status} - ${errorMessage}`);
                     }
 
                     const data = await response.json();
                     
-                    const translatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-                    
-                    if (!translatedText) {
-                       throw new Error("Translation failed to return text.");
+                    if (!data.candidates || data.candidates.length === 0) {
+                        const feedback = data.promptFeedback?.blockReason;
+                        const message = feedback ? `Translation blocked: ${feedback}` : "Translation failed: No response from API.";
+                        throw new Error(message);
                     }
                     
+                    const translatedText = data.candidates[0].content.parts[0].text.trim();
                     displayResult(text, translatedText);
 
                 } catch (error) {
                     console.error('Translation error:', error);
-                    showNotification('Translation failed. Please check the console for details.');
+                    showNotification(error.message || 'Translation failed. Please check the console.');
                     resetUI();
                 } finally {
                     loadingIndicator.style.display = 'none';
                 }
             }
 
-            /**
-             * Displays the translation result.
-             * @param {string} original - The original text.
-             * @param {string} translated - The translated text.
-             */
             function displayResult(original, translated) {
                 originalTextElem.textContent = original;
                 translatedTextElem.textContent = translated;
                 resultCard.style.display = 'block';
             }
 
-            /**
-             * Copies the translated text to the clipboard.
-             */
             function copyText() {
                 navigator.clipboard.writeText(translatedTextElem.textContent)
                     .then(() => showNotification('Copied to clipboard!', 'success'))
@@ -315,9 +273,6 @@
                     });
             }
 
-            /**
-             * Downloads the translated text as a .txt file.
-             */
             function downloadText() {
                 const text = translatedTextElem.textContent;
                 const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -325,7 +280,6 @@
                 const a = document.createElement('a');
                 
                 const now = new Date();
-                // Create a clean filename
                 const fileName = `Translated_${targetLangSelect.value}_${now.toISOString().replace(/[:.]/g, '-').slice(0, 19)}.txt`;
                 
                 a.href = url;
@@ -337,39 +291,31 @@
                 showNotification('Download started!', 'success');
             }
 
-            /**
-             * Resets the UI to the initial state.
-             */
             function resetUI() {
                 userText.value = '';
-                sourceLangSelect.value = ''; // Reset dropdown to placeholder
-                targetLangSelect.value = ''; // Reset dropdown to placeholder
-                fileUpload.value = ''; // Reset file input
+                sourceLangSelect.value = '';
+                targetLangSelect.value = '';
+                fileUpload.value = '';
                 
                 resultCard.style.display = 'none';
                 loadingIndicator.style.display = 'none';
                 translatorCard.style.display = 'block';
-                toggleTranslateButton(); // Disable button after reset
+                toggleTranslateButton();
             }
 
-
-            // --- EVENT LISTENERS ---
             translateBtn.addEventListener('click', handleTranslate);
             fileUpload.addEventListener('change', handleFileUpload);
             copyBtn.addEventListener('click', copyText);
             downloadBtn.addEventListener('click', downloadText);
             resetBtn.addEventListener('click', resetUI);
-            uploadBtn.addEventListener('click', () => fileUpload.click()); // Trigger file input on button click
+            uploadBtn.addEventListener('click', () => fileUpload.click());
             
-            // Check button state whenever text or language selection changes
             userText.addEventListener('input', toggleTranslateButton);
             sourceLangSelect.addEventListener('change', toggleTranslateButton);
             targetLangSelect.addEventListener('change', toggleTranslateButton);
 
-
-            // --- INITIALIZATION ---
             populateLanguages();
-            toggleTranslateButton(); // Set initial button state
+            toggleTranslateButton();
         });
     </script>
 
