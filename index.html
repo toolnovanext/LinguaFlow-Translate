@@ -30,8 +30,15 @@
         #file-upload {
             display: none;
         }
+        /* Fix for the dropdown click issue */
         select {
-            z-index: 10;
+            /* raise above possible overlays and ensure native menu appearance */
+            position: relative;
+            z-index: 99999;
+            -webkit-appearance: menulist-button;
+            appearance: menulist-button;
+            pointer-events: auto;
+            background-color: transparent;
         }
     </style>
 </head>
@@ -79,7 +86,7 @@
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            <p class="mt-4 text-lg font-medium text-gray-700">Translating with Gemini AI...</p>
+            <p class="mt-4 text-lg font-medium text-gray-700">Translating...</p>
         </div>
 
         <div id="result-card" class="bg-white rounded-xl shadow-2xl p-6 md:p-8" style="display:none;">
@@ -129,9 +136,6 @@
             const notification = document.getElementById('notification');
             const notificationMessage = document.getElementById('notification-message');
             
-            const apiKey = "AIzaSyDCFvhS8RVWHicWe4ZjptBJvut_yDp4dJo";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
             const languages = [
                 "Afrikaans", "Albanian", "Amharic", "Arabic", "Armenian", "Azerbaijani", "Basque", "Belarusian", "Bengali", "Bosnian",
                 "Bulgarian", "Catalan", "Cebuano", "Chichewa", "Chinese (Simplified)", "Chinese (Traditional)", "Corsican", "Croatian",
@@ -212,42 +216,23 @@
 
                 const prompt = `Translate the following text from ${sourceLang} to ${targetLang}. Focus on high accuracy and natural flow, making it a polished translation. Do not include any introductory phrases, explanations, or quotes/markers. ONLY output the final, enhanced translation.\nTEXT: "${text}"`;
                 
+                const apiUrl = `https://chatgpt-4-hridoy.vercel.app/?question=${encodeURIComponent(prompt)}`;
+                
                 try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            contents: [{
-                                parts: [{
-                                    text: prompt
-                                }]
-                            }]
-                        })
-                    });
+                    const response = await fetch(apiUrl);
 
                     if (!response.ok) {
-                        let errorData;
-                        try {
-                            errorData = await response.json();
-                        } catch (e) {
-                            errorData = await response.text();
-                        }
-                        const errorMessage = errorData?.error?.message || JSON.stringify(errorData);
-                        throw new Error(`API error: ${response.status} - ${errorMessage}`);
+                        const errorText = await response.text();
+                        throw new Error(`API error: ${response.status} - ${errorText || 'Unknown error'}`);
                     }
 
-                    const data = await response.json();
+                    const translatedText = await response.text();
                     
-                    if (!data.candidates || data.candidates.length === 0) {
-                        const feedback = data.promptFeedback?.blockReason;
-                        const message = feedback ? `Translation blocked: ${feedback}` : "Translation failed: No response from API.";
-                        throw new Error(message);
+                    if (!translatedText || translatedText.trim() === '') {
+                        throw new Error("Translation failed: Received an empty response from the API.");
                     }
                     
-                    const translatedText = data.candidates[0].content.parts[0].text.trim();
-                    displayResult(text, translatedText);
+                    displayResult(text, translatedText.trim());
 
                 } catch (error) {
                     console.error('Translation error:', error);
@@ -265,12 +250,19 @@
             }
 
             function copyText() {
-                navigator.clipboard.writeText(translatedTextElem.textContent)
-                    .then(() => showNotification('Copied to clipboard!', 'success'))
-                    .catch(err => {
-                        console.error('Failed to copy:', err)
-                        showNotification('Could not copy text.');
-                    });
+                // Using document.execCommand for wider compatibility in iFrames
+                const textarea = document.createElement('textarea');
+                textarea.value = translatedTextElem.textContent;
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showNotification('Copied to clipboard!', 'success');
+                } catch (err) {
+                    console.error('Failed to copy:', err);
+                    showNotification('Could not copy text.');
+                }
+                document.body.removeChild(textarea);
             }
 
             function downloadText() {
