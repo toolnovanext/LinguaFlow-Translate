@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart AI Language Translator</title>
-    <script src="https://toolnovanext.github.io/scripts/navigation.js" defer></script>
-    <script src="https://toolnovanext.github.io/scripts/notification.js" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -30,11 +28,9 @@
         #file-upload {
             display: none;
         }
-        /* Fix for the dropdown click issue */
         select {
-            /* raise above possible overlays and ensure native menu appearance */
             position: relative;
-            z-index: 99999;
+            z-index: 10;
             -webkit-appearance: menulist-button;
             appearance: menulist-button;
             pointer-events: auto;
@@ -201,49 +197,64 @@
                 }
             }
             
-async function handleTranslate() {
-    const sourceLang = sourceLangSelect.value;
-    const targetLang = targetLangSelect.value;
-    const text = userText.value.trim();
+            async function handleTranslate() {
+                const sourceLang = sourceLangSelect.value;
+                const targetLang = targetLangSelect.value;
+                const text = userText.value.trim();
 
-    if (!sourceLang || !targetLang || sourceLang === targetLang || !text) {
-        showNotification("Please select valid languages and enter text.");
-        return;
-    }
+                if (!sourceLang || !targetLang || sourceLang === targetLang || !text) {
+                    showNotification("Please select valid languages and enter text.");
+                    return;
+                }
 
-    translatorCard.style.display = 'none';
-    loadingIndicator.style.display = 'block';
+                translatorCard.style.display = 'none';
+                loadingIndicator.style.display = 'block';
+                resultCard.style.display = 'none';
 
-    const prompt = `Translate the following text from ${sourceLang} to ${targetLang}. Focus on high accuracy and natural flow, making it a polished translation. Do not include any introductory phrases, explanations, or quotes/markers. ONLY output the final, enhanced translation.\nTEXT: "${text}"`;
-    
-    const apiUrl = `https://chatgpt-4-hridoy.vercel.app/?question=${encodeURIComponent(prompt)}`;
-    
-    try {
-        const response = await fetch(apiUrl);
+                const prompt = `Translate the following text from ${sourceLang} to ${targetLang}. Focus on high accuracy and natural flow, making it a polished translation. Do not include any introductory phrases, explanations, or quotes/markers. ONLY output the final, enhanced translation.\nTEXT: "${text}"`;
+                
+                const apiKey = "AIzaSyAsnCW93NN4GS7WD5f8su5S6EeVdQiA_Ls";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`API error: ${response.status} - ${errorText || 'Unknown error'}`);
-        }
+                const payload = {
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                };
 
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
 
-        const data = await response.json();
-        const translatedText = data.result;
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error.message || `API error: ${response.status}`);
+                    }
 
-        if (!translatedText || translatedText.trim() === '') {
-            throw new Error("Translation failed: Received an empty response from the API.");
-        }
-        
-        displayResult(text, translatedText.trim());
+                    const result = await response.json();
+                    const translatedText = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    } catch (error) {
-        console.error('Translation error:', error);
-        showNotification(error.message || 'Translation failed. Please check the console.');
-        resetUI();
-    } finally {
-        loadingIndicator.style.display = 'none';
-    }
-}
+                    if (!translatedText || translatedText.trim() === '') {
+                        throw new Error("Translation failed: Received an empty or invalid response from the API.");
+                    }
+
+                    displayResult(text, translatedText.trim());
+
+                } catch (error) {
+                    console.error('Translation error:', error);
+                    showNotification(error.message || 'Translation failed. Please check your API key and console.');
+                    resetUI();
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
 
             function displayResult(original, translated) {
                 originalTextElem.textContent = original;
@@ -252,7 +263,6 @@ async function handleTranslate() {
             }
 
             function copyText() {
-                // Using document.execCommand for wider compatibility in iFrames
                 const textarea = document.createElement('textarea');
                 textarea.value = translatedTextElem.textContent;
                 document.body.appendChild(textarea);
